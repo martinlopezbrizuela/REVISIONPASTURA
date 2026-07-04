@@ -1,1 +1,1630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Diagnostico - AGROFORCE</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ────────────────────────────────────────────── */
+:root {
+  --verde:   #016C00;
+  --verde2:  #024e00;
+  --verde3:  #03890026;
+  --navy:    #1A1363;
+  --navy2:   #110d42;
+  --blanco:  #FFFFFF;
+  --gris0:   #F4F6F4;
+  --gris1:   #E6EBE6;
+  --gris2:   #B8C4B8;
+  --gris3:   #6B7A6B;
+  --negro:   #0D0D0D;
+  --rojo:    #B52B2B;
+  --ambar:   #B07A00;
+  --acento:  #33A000;
+  --fs-xs:   11px;
+  --fs-sm:   13px;
+  --fs-md:   15px;
+  --fs-lg:   18px;
+  --fs-xl:   22px;
+  --fs-2xl:  28px;
+  --fs-3xl:  36px;
+  --r:       10px;
+  --r-lg:    16px;
+  --shadow:  0 2px 12px rgba(0,0,0,.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--gris0);
+  color:var(--negro);
+  font-size:var(--fs-md);
+  line-height:1.6;
+}
 
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.app{ max-width:1360px; margin:0 auto; padding:24px 20px 60px; }
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.topbar{
+  background:var(--navy);
+  color:var(--blanco);
+  border-radius:var(--r-lg);
+  padding:0;
+  display:flex;
+  align-items:stretch;
+  margin-bottom:24px;
+  overflow:hidden;
+  box-shadow:var(--shadow-lg);
+}
+.topbar-logo{
+  background:var(--blanco);
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:120px;
+  border-right:3px solid var(--verde);
+}
+.topbar-logo img{ height:54px; object-fit:contain; display:block; }
+.topbar-body{ padding:16px 24px; flex:1; }
+.topbar-body h1{
+  font-size:var(--fs-lg);
+  font-weight:700;
+  letter-spacing:.3px;
+  margin-bottom:2px;
+}
+.topbar-body .sub{
+  font-size:var(--fs-sm);
+  opacity:.75;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.topbar-meta{
+  padding:16px 24px;
+  font-size:var(--fs-xs);
+  opacity:.8;
+  text-align:right;
+  line-height:1.8;
+  border-left:1px solid rgba(255,255,255,.12);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:180px;
+}
+.topbar-meta strong{ font-size:var(--fs-sm); }
+
+/* ── ACTIONS ────────────────────────────────────────────── */
+.actions{
+  display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; align-items:center;
+}
+.btn{
+  display:inline-flex; align-items:center; gap:7px;
+  border:none; border-radius:8px; padding:10px 18px;
+  font-family:'DM Sans',sans-serif; font-size:var(--fs-sm);
+  font-weight:600; cursor:pointer; transition:filter .15s,transform .1s;
+  text-decoration:none;
+}
+.btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+.btn:active{ transform:translateY(0); }
+.btn-primary{  background:var(--verde);  color:#fff; }
+.btn-secondary{ background:var(--navy);   color:#fff; }
+.btn-teal{     background:#1a5c8a;        color:#fff; }
+.btn-danger{   background:var(--rojo);    color:#fff; }
+.btn-ghost{    background:var(--gris1);   color:var(--gris3); }
+#syncMsg{ font-size:var(--fs-sm); margin-left:8px; font-weight:500; }
+
+/* ── MODAL ──────────────────────────────────────────────── */
+.modal-overlay{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.55); z-index:999;
+  align-items:center; justify-content:center; padding:20px;
+}
+.modal-box{
+  background:#fff; border-radius:var(--r-lg);
+  padding:28px; max-width:760px; width:100%;
+  max-height:82vh; overflow-y:auto;
+  box-shadow:var(--shadow-lg);
+}
+.modal-header{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;
+}
+.modal-header h2{ font-size:var(--fs-xl); color:var(--navy); }
+
+/* ── SECTION CARD ───────────────────────────────────────── */
+section.card{
+  background:#fff;
+  border-radius:var(--r-lg);
+  padding:28px;
+  margin-bottom:20px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--gris1);
+}
+section.card h2{
+  font-size:var(--fs-lg);
+  font-weight:700;
+  color:var(--navy);
+  margin-bottom:20px;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--verde);
+  display:flex; align-items:center; gap:10px;
+}
+section.card h2 .ico{ font-size:20px; }
+section.card h3{
+  font-size:var(--fs-md);
+  font-weight:600;
+  color:var(--verde2);
+  margin:22px 0 12px;
+}
+
+/* ── SECTION NAV TABS ───────────────────────────────────── */
+.section-nav{
+  display:flex; gap:4px; flex-wrap:wrap; margin-bottom:8px;
+}
+.section-tab{
+  background:var(--gris1); border:none; border-radius:8px 8px 0 0;
+  padding:9px 16px; font-family:'DM Sans',sans-serif;
+  font-size:var(--fs-sm); font-weight:600; cursor:pointer;
+  color:var(--gris3); transition:all .15s;
+}
+.section-tab.active{
+  background:#fff; color:var(--navy);
+  border:1px solid var(--gris1); border-bottom:1px solid #fff;
+  margin-bottom:-1px; position:relative; z-index:2;
+}
+.section-panel{ display:none; }
+.section-panel.active{ display:block; }
+
+/* ── FORM ELEMENTS ──────────────────────────────────────── */
+.grid2{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+label.field{
+  display:flex; flex-direction:column; gap:5px;
+  font-size:var(--fs-sm); font-weight:600; color:var(--gris3);
+}
+label.field span{ font-weight:600; }
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%; padding:9px 12px;
+  border:1.5px solid var(--gris1);
+  border-radius:8px; font-family:'DM Sans',sans-serif;
+  font-size:var(--fs-sm); color:var(--negro);
+  background:#fff; transition:border-color .15s;
+}
+input:focus, select:focus, textarea:focus{
+  outline:none; border-color:var(--verde);
+}
+textarea{ min-height:90px; resize:vertical; }
+textarea.tall{ min-height:160px; }
+
+/* ── CHECKS GRID ────────────────────────────────────────── */
+.checks{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px 18px; margin-top:6px;
+}
+.checks label{
+  display:flex; align-items:center; gap:8px;
+  font-size:var(--fs-sm); font-weight:400; cursor:pointer;
+}
+.checks input[type=checkbox]{
+  width:17px; height:17px; min-width:17px;
+  accent-color:var(--verde); flex:0 0 auto;
+}
+
+/* ── SUB CARD ───────────────────────────────────────────── */
+.sub-card{
+  background:var(--gris0);
+  border:1px solid var(--gris1);
+  border-radius:var(--r);
+  padding:16px; margin-top:14px;
+}
+.sub-card h4{ font-size:var(--fs-sm); color:var(--gris3); margin-bottom:10px; }
+
+/* ── POTRERO CARD ───────────────────────────────────────── */
+.potrero-card{
+  background:linear-gradient(135deg,#f0f7f0,#fff);
+  border:1.5px solid var(--verde3);
+  border-radius:var(--r);
+  padding:18px; margin-top:14px;
+  position:relative;
+}
+.potrero-card .potrero-num{
+  position:absolute; top:14px; right:16px;
+  background:var(--verde); color:#fff;
+  font-family:'DM Mono',monospace; font-size:var(--fs-xs);
+  padding:2px 8px; border-radius:20px;
+}
+
+/* ── TABLE ──────────────────────────────────────────────── */
+.tbl{ width:100%; border-collapse:collapse; margin-top:12px; font-size:var(--fs-sm); }
+.tbl th{
+  background:var(--navy); color:#fff;
+  padding:9px 12px; text-align:left;
+  font-weight:600; font-size:var(--fs-xs); letter-spacing:.5px; text-transform:uppercase;
+}
+.tbl th:first-child{ border-radius:8px 0 0 0; }
+.tbl th:last-child{ border-radius:0 8px 0 0; }
+.tbl td{ border-bottom:1px solid var(--gris1); padding:8px 10px; vertical-align:top; }
+.tbl td input, .tbl td select, .tbl td textarea{ border:1px solid var(--gris1); font-size:var(--fs-sm); }
+.tbl td textarea{ min-height:60px; }
+
+/* ── BADGE ──────────────────────────────────────────────── */
+.badge{
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-size:var(--fs-xs); font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+}
+.badge-verde{ background:var(--verde3); color:var(--verde2); }
+.badge-navy{ background:#1A136322; color:var(--navy2); }
+.badge-red{ background:#b52b2b22; color:var(--rojo); }
+.badge-ambar{ background:#b07a0022; color:var(--ambar); }
+
+/* ── DIAGNÓSTICO DUAL ───────────────────────────────────── */
+.diag-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:18px; }
+.diag-box{
+  border-radius:var(--r);
+  border:2px solid var(--gris1);
+  padding:18px;
+  background:var(--gris0);
+}
+.diag-box.verde{ border-color:var(--verde); background:#f0f7f0; }
+.diag-box.navy{ border-color:var(--navy); background:#f0f0f8; }
+.diag-box h4{ font-size:var(--fs-md); font-weight:700; margin-bottom:8px; }
+.diag-box.verde h4{ color:var(--verde2); }
+.diag-box.navy h4{ color:var(--navy2); }
+.diag-box p{ font-size:var(--fs-xs); color:var(--gris3); margin-bottom:10px; }
+
+/* ── RECOMENDACIONES ────────────────────────────────────── */
+.rec-card{
+  background:#fff; border:1.5px solid var(--gris1);
+  border-radius:var(--r); padding:16px; margin-top:12px;
+  display:grid; grid-template-columns:130px 1fr 100px 140px 120px 36px;
+  gap:10px; align-items:start;
+}
+.rec-card-header{
+  display:grid; grid-template-columns:130px 1fr 100px 140px 120px 36px;
+  gap:10px; padding:0 16px;
+  font-size:var(--fs-xs); font-weight:700; color:var(--gris3);
+  text-transform:uppercase; letter-spacing:.4px; margin-top:14px;
+}
+.btn-rm{
+  background:var(--gris1); border:none; border-radius:6px;
+  width:32px; height:32px; cursor:pointer; font-size:15px;
+  color:var(--gris3); display:flex; align-items:center; justify-content:center;
+}
+.btn-rm:hover{ background:#f0dddd; color:var(--rojo); }
+
+/* ── REPORT ─────────────────────────────────────────────── */
+.report-section{
+  display:none; background:#fff;
+  border-radius:var(--r-lg); padding:36px;
+  margin-top:24px; box-shadow:var(--shadow-lg);
+}
+.report-header-block{
+  background:var(--navy);
+  color:#fff; border-radius:var(--r-lg);
+  overflow:hidden; margin-bottom:28px;
+  display:flex; align-items:stretch;
+}
+.rh-logo{
+  background:#fff; padding:16px 20px;
+  display:flex; align-items:center; justify-content:center;
+  min-width:130px; border-right:3px solid var(--verde);
+}
+.rh-logo img{ height:80px; object-fit:contain; }
+.rh-body{ padding:22px 28px; flex:1; }
+.rh-body h1{ font-size:var(--fs-xl); font-weight:700; margin-bottom:2px; }
+.rh-body .rh-sub{ font-size:var(--fs-xs); opacity:.7; text-transform:uppercase; letter-spacing:.6px; margin-bottom:12px; }
+.rh-meta{ display:flex; flex-wrap:wrap; gap:20px; border-top:1px solid rgba(255,255,255,.2); padding-top:10px; }
+.rh-meta-item{ font-size:var(--fs-xs); opacity:.85; }
+.rh-meta-item strong{ display:block; font-size:var(--fs-sm); }
+.rh-right{
+  padding:22px 24px; border-left:1px solid rgba(255,255,255,.15);
+  display:flex; flex-direction:column; justify-content:center;
+  gap:4px; min-width:170px; text-align:right;
+}
+.rh-right .doc-eye{ font-size:var(--fs-xs); opacity:.6; text-transform:uppercase; letter-spacing:.6px; }
+.rh-right .doc-name{ font-size:var(--fs-md); font-weight:700; }
+.rh-right .doc-date{ font-size:var(--fs-xs); opacity:.8; margin-top:6px; }
+
+/* KPI STRIP */
+.kpi-strip{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+.kpi-card{
+  background:var(--gris0); border:1px solid var(--gris1);
+  border-radius:var(--r); padding:16px;
+  border-left:4px solid var(--verde);
+}
+.kpi-card span{ font-size:var(--fs-xs); color:var(--gris3); text-transform:uppercase; letter-spacing:.4px; }
+.kpi-card strong{ display:block; font-size:var(--fs-xl); color:var(--navy); font-weight:700; margin-top:4px; }
+
+/* REPORT BLOCKS */
+.rblock{
+  background:var(--gris0); border:1px solid var(--gris1);
+  border-radius:var(--r); padding:20px; margin-bottom:18px;
+  line-height:1.75;
+}
+.rblock h3{ font-size:var(--fs-md); font-weight:700; color:var(--navy); margin-bottom:10px; }
+.rblock p{ font-size:var(--fs-sm); color:#333; margin-bottom:6px; }
+
+/* CHART GRID */
+.chart-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
+.chart-box{
+  background:var(--gris0); border:1px solid var(--gris1);
+  border-radius:var(--r); padding:18px;
+}
+.chart-box h3{ font-size:var(--fs-sm); font-weight:700; color:var(--navy); margin-bottom:12px; }
+.chart-box canvas{ max-height:220px; }
+
+/* DIAG REPORT */
+.rblock.verde-border{ border-left:4px solid var(--verde); }
+.rblock.navy-border{ border-left:4px solid var(--navy); }
+
+/* FIRMAS */
+.signatures{ display:flex; gap:60px; flex-wrap:wrap; margin-top:60px; }
+.sig{ border-top:1.5px solid var(--negro); width:280px; padding-top:10px; }
+.sig p{ margin-bottom:28px; font-size:var(--fs-sm); }
+.sig strong{ display:block; font-size:var(--fs-md); font-weight:700; }
+.sig span{ display:block; font-size:var(--fs-sm); color:var(--gris3); }
+
+/* ── HISTORIAL TAB ──────────────────────────────────────── */
+.hist-card{
+  border:1.5px solid var(--gris1); border-radius:var(--r);
+  padding:16px; margin-bottom:12px; background:var(--gris0);
+  display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+}
+.hist-card-body{ flex:1; }
+.hist-card-body h4{ font-size:var(--fs-md); font-weight:700; color:var(--navy); margin-bottom:4px; }
+.hist-card-body .meta{ font-size:var(--fs-xs); color:var(--gris3); margin-bottom:6px; }
+.hist-card-body .diag-preview{ font-size:var(--fs-sm); color:#444; }
+.hist-empty{ text-align:center; color:var(--gris3); padding:40px 0; font-size:var(--fs-sm); }
+
+
+/* ── MERCADO ────────────────────────────────────────────── */
+.merc-calc{
+  background:linear-gradient(135deg,#f0f7f0,#e8f4e8);
+  border:1.5px solid var(--verde3);
+  border-radius:var(--r);
+  padding:14px 18px;
+  display:flex; flex-wrap:wrap; gap:24px;
+  font-size:var(--fs-sm);
+}
+.merc-stat{ display:flex; flex-direction:column; gap:3px; }
+.merc-stat .label{ font-size:var(--fs-xs); color:var(--gris3); text-transform:uppercase; letter-spacing:.4px; }
+.merc-stat .value{ font-size:var(--fs-xl); font-weight:700; color:var(--verde2); }
+.merc-stat .pct{ font-size:var(--fs-sm); color:var(--verde); font-weight:600; }
+.merc-stat.highlight .value{ color:var(--navy); }
+
+
+/* -- MERCADO --------------------------------------------- */
+.merc-calc{
+  background:linear-gradient(135deg,#f0f7f0,#e8f4e8);
+  border:1.5px solid #03890026;
+  border-radius:10px;
+  padding:14px 18px;
+  display:flex; flex-wrap:wrap; gap:24px;
+  font-size:13px;
+}
+.merc-stat{ display:flex; flex-direction:column; gap:3px; }
+.merc-stat .label{ font-size:11px; color:#6B7A6B; text-transform:uppercase; letter-spacing:.4px; }
+.merc-stat .value{ font-size:22px; font-weight:700; color:#024e00; }
+.merc-stat .pct{ font-size:13px; color:#016C00; font-weight:600; }
+.merc-stat.highlight .value{ color:#1A1363; }
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:900px){
+  .grid2,.grid3{ grid-template-columns:1fr; }
+  .diag-grid{ grid-template-columns:1fr; }
+  .kpi-strip{ grid-template-columns:repeat(2,1fr); }
+  .chart-grid{ grid-template-columns:1fr; }
+  .topbar{ flex-direction:column; }
+  .topbar-meta{ border-left:none; border-top:1px solid rgba(255,255,255,.12); text-align:left; }
+  .rec-card{ grid-template-columns:1fr; }
+  .rec-card-header{ display:none; }
+  .report-header-block{ flex-direction:column; }
+  .rh-right{ border-left:none; border-top:1px solid rgba(255,255,255,.15); text-align:left; }
+  .signatures{ gap:30px; }
+}
+@media print{
+  body *{ visibility:hidden; }
+  #writtenReport, #writtenReport *{ visibility:visible; }
+  #writtenReport{ display:block!important; position:absolute; left:0; top:0; width:100%; padding:20px; background:#fff; box-shadow:none; }
+  .actions, button{ display:none!important; }
+  .chart-grid{ grid-template-columns:repeat(3,1fr); }
+  .kpi-strip{ grid-template-columns:repeat(4,1fr); }
+  .report-header-block, .rblock, .kpi-card{ page-break-inside:avoid; }
+  .rh-logo img{ height:80px; }
+  .report-header-block{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  th{ background:var(--navy)!important; color:#fff!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+
+<!-- Apple Touch Icon para iPad/iPhone home screen -->
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AGROFORCE">
+<meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+<div class="app">
+
+<!-- ── TOPBAR ─────────────────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <img id="headerLogo" src="" alt="AGROFORCE">
+  </div>
+  <div class="topbar-body">
+    <h1>Informe de Diagnóstico</h1>
+    <div class="sub">AGROFORCE Productos Agrícolas</div>
+  </div>
+  <div class="topbar-meta">
+    <strong>RUC: 80148174-0</strong>
+    Asunción · Ypacararaí · Filadelfia<br>
+    Dr. M. López · Reg. N°3416<br>
+    Dr. C. Di Natale · Reg. N°1920
+  </div>
+</div>
+
+<!-- ── ACTIONS ────────────────────────────────────────────── -->
+<div class="actions">
+  <button class="btn btn-primary" onclick="generateReport()">📄 Generar informe</button>
+  <button class="btn btn-secondary" onclick="saveReporte()">💾 Guardar en nube</button>
+  <button class="btn btn-teal" onclick="showHistorial()">📋 Historial</button>
+  <button class="btn btn-ghost" onclick="generatePDF()">🖨️ Imprimir / PDF</button>
+  <button class="btn btn-danger" onclick="clearForm()">🗑️ Limpiar</button>
+  <span id="syncMsg"></span>
+</div>
+
+<!-- ── MODAL HISTORIAL ────────────────────────────────────── -->
+<div id="historialModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Historial de informes</h2>
+      <button class="btn btn-danger" onclick="closeHistorial()">✕ Cerrar</button>
+    </div>
+    <div id="historialLista"></div>
+  </div>
+</div>
+
+<form id="mainForm">
+
+<!-- ────────────────────────────────────────────────────────── -->
+<!-- TAB NAV -->
+<!-- ────────────────────────────────────────────────────────── -->
+<div class="section-nav">
+  <button type="button" class="section-tab active" onclick="showTab('tab-ident')">🏠 Establecimiento</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-carga')">🐄 Carga animal</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-pasturas')">🌿 Pasturas</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-infra')">🏗️ Infraestructura</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-prod')">🧪 Productos AGROFORCE</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-sanidad')">🩺 Sanidad</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-mercado')">📊 Participación AGROFORCE</button>
+  <button type="button" class="section-tab" onclick="showTab('tab-rec')">💡 Recomendaciones</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 1: IDENTIFICACIÓN -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel active" id="tab-ident">
+  <h2><span class="ico">🏠</span> Identificación del establecimiento</h2>
+
+  <div class="grid2">
+    <label class="field"><span>Fecha de visita</span><input type="date" name="fecha"></label>
+    <label class="field"><span>Código del establecimiento</span><input type="text" name="codigoEstablecimiento"></label>
+    <label class="field"><span>Nombre del establecimiento</span><input type="text" name="establecimiento"></label>
+    <label class="field"><span>Propietario</span><input type="text" name="propietario"></label>
+    <label class="field"><span>Razón social</span><input type="text" name="razonSocial"></label>
+    <label class="field"><span>Encargado</span><input type="text" name="encargado"></label>
+    <label class="field"><span>Teléfono</span><input type="text" name="telefono"></label>
+    <label class="field"><span>Departamento / Distrito</span><input type="text" name="ubicacion"></label>
+    <label class="field"><span>Coordenadas GPS</span><input type="text" name="coordenadas" placeholder="Ej: -22.5°, -57.3°"></label>
+    <label class="field"><span>Veterinario asesor actual</span><input type="text" name="vetAsesor"></label>
+  </div>
+
+  <div class="grid3" style="margin-top:16px;">
+    <label class="field"><span>Superficie total (ha)</span><input type="number" name="haTotal"></label>
+    <label class="field"><span>Ha pasturas</span><input type="number" name="haPasturas"></label>
+    <label class="field"><span>Ha agrícolas</span><input type="number" name="haAgricolas"></label>
+    <label class="field"><span>Ha reserva / monte</span><input type="number" name="haReserva"></label>
+    <label class="field"><span>Cantidad de potreros</span><input type="number" name="potreros"></label>
+    <label class="field"><span>Personal total</span><input type="number" name="cantidadPersonal"></label>
+  </div>
+
+  <h3>Tipo de explotación</h3>
+  <div class="checks">
+    <label><input type="checkbox" name="tipoExplotacion" value="Cría"> Cría</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Recría"> Recría</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Invernada"> Invernada</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Feedlot"> Feedlot</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Tambo"> Tambo</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Cabaña"> Cabaña</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Ovinos"> Ovinos</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Equinos"> Equinos</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Mixto"> Mixto</label>
+    <label><input type="checkbox" name="tipoExplotacion" value="Apícola"> Apícola</label>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 2: CARGA ANIMAL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-carga">
+  <h2><span class="ico">🐄</span> Carga animal / Existencia ganadera</h2>
+  <div class="grid2">
+    <label class="field"><span>Capacidad total de animales</span><input type="number" name="capacidadAnimales"></label>
+    <label class="field"><span>Cantidad actual de animales</span><input type="number" name="animalesActuales"></label>
+    <label class="field"><span>Carga animal estimada</span><input type="text" name="cargaAnimal" placeholder="Ej: 1.2 cab/ha"></label>
+    <label class="field"><span>Categoría predominante</span><input type="text" name="categoriaPredominante"></label>
+  </div>
+
+  <h3>Detalle por categoría</h3>
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Categoría</th><th>Cantidad</th><th>Observaciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Terneros/as</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Novillitos</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Novillos</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Vaquillas</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Vacas</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Toros</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Ovinos / Caprinos</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+      <tr><td>Equinos</td><td><input type="number" class="cat-cantidad"></td><td><input type="text"></td></tr>
+    </tbody>
+  </table>
+  <label class="field" style="margin-top:16px;"><span>Observaciones sobre carga animal</span><textarea name="obsCargaAnimal"></textarea></label>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 3: PASTURAS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-pasturas">
+  <h2><span class="ico">🌿</span> Potreros y pasturas</h2>
+
+  <div id="potrerosContainer">
+    <!-- potrero 1 generado por JS -->
+  </div>
+  <button type="button" class="btn btn-primary" style="margin-top:16px;" onclick="addPotrero()">+ Agregar potrero</button>
+
+  <h3>Estado general de las pasturas</h3>
+  <div class="grid2">
+    <label class="field"><span>Especies presentes (principal)</span><input type="text" name="especiePrincipal" placeholder="Ej: Brachiaria brizantha cv. Marandú"></label>
+    <label class="field"><span>Otras especies</span><input type="text" name="especiesOtras" placeholder="Ej: Panicum maximum, Tifton 85"></label>
+    <label class="field"><span>Cobertura promedio estimada (%)</span><input type="number" name="coberturaProm" min="0" max="100"></label>
+    <label class="field"><span>Estado general de pasturas</span>
+      <select name="estadoPasturasGral">
+        <option value=""></option>
+        <option>Excelente</option><option>Bueno</option><option>Regular</option><option>Degradado</option><option>Muy degradado</option>
+      </select>
+    </label>
+    <label class="field"><span>Nivel de malezas</span>
+      <select name="nivelMalezas">
+        <option value=""></option>
+        <option>Sin presencia</option><option>Leve</option><option>Moderado</option><option>Alto</option><option>Crítico</option>
+      </select>
+    </label>
+    <label class="field"><span>Principales malezas detectadas</span><input type="text" name="malezasPrincipales" placeholder="Ej: Ipomoea, Cenchrus, Sida"></label>
+  </div>
+
+  <h3>Historial de intervenciones</h3>
+  <div id="intervencionesContainer"></div>
+  <button type="button" class="btn btn-secondary" style="margin-top:14px;" onclick="addIntervencion()">+ Agregar intervención</button>
+
+  <label class="field" style="margin-top:18px;"><span>Observaciones generales de pasturas</span><textarea name="obsPasturas" class="tall"></textarea></label>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 4: INFRAESTRUCTURA -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-infra">
+  <h2><span class="ico">🏗️</span> Infraestructura</h2>
+  <div class="grid2">
+    <label class="field"><span>Estado de caminos internos</span>
+      <select name="caminos"><option value=""></option><option>Bueno</option><option>Regular</option><option>Malo</option></select>
+    </label>
+    <label class="field"><span>Acceso en días de lluvia</span>
+      <select name="lluvia"><option value=""></option><option>Bueno</option><option>Regular</option><option>Difícil</option></select>
+    </label>
+    <label class="field"><span>Drenaje general</span>
+      <select name="drenaje"><option value=""></option><option>Bueno</option><option>Regular</option><option>Malo</option></select>
+    </label>
+    <label class="field"><span>Presencia de barro</span><input type="text" name="barro"></label>
+    <label class="field"><span>Cantidad de tajamares</span><input type="number" name="tajamares"></label>
+    <label class="field"><span>Estado de tajamares</span><input type="text" name="estadoTajamares"></label>
+    <label class="field"><span>Cantidad de bebederos</span><input type="number" name="bebederos"></label>
+    <label class="field"><span>Calidad del agua</span><input type="text" name="calidadAgua"></label>
+    <label class="field"><span>Manga y cepo</span><input type="text" name="manga"></label>
+    <label class="field"><span>Enfermería</span>
+      <select name="enfermeria"><option value=""></option><option>Sí</option><option>No</option></select>
+    </label>
+    <label class="field"><span>Depósito de insumos agrícolas</span>
+      <select name="deposito"><option value=""></option><option>Sí, adecuado</option><option>Sí, precario</option><option>No</option></select>
+    </label>
+    <label class="field"><span>Equipo de pulverización</span>
+      <select name="pulverizador"><option value=""></option><option>Sí, en buen estado</option><option>Sí, requiere mantenimiento</option><option>No</option></select>
+    </label>
+  </div>
+  <label class="field" style="margin-top:16px;"><span>Observaciones de infraestructura</span><textarea name="obsInfraestructura"></textarea></label>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 5: PRODUCTOS AGROFORCE -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-prod">
+  <h2><span class="ico">🧪</span> Productos AGROFORCE utilizados</h2>
+  <p style="font-size:var(--fs-sm);color:var(--gris3);margin-bottom:16px;">Registrá los productos agroquímicos AGROFORCE utilizados o recomendados en el establecimiento. Esto se verá reflejado en el informe y las recomendaciones finales.</p>
+
+  <div id="prodContainer"></div>
+  <button type="button" class="btn btn-primary" style="margin-top:14px;" onclick="addProducto()">+ Agregar producto</button>
+
+  <h3>Otros insumos no AGROFORCE</h3>
+  <table class="tbl">
+    <thead><tr><th>Producto / Insumo</th><th>Empresa</th><th>Uso / Aplicación</th></tr></thead>
+    <tbody id="otrosInsumosBody">
+      <tr>
+        <td><input type="text" class="oi-nombre"></td>
+        <td><input type="text" class="oi-empresa"></td>
+        <td><input type="text" class="oi-uso"></td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="button" class="btn btn-ghost" style="margin-top:10px;" onclick="addOtroInsumo()">+ Agregar otro insumo</button>
+
+  <label class="field" style="margin-top:18px;"><span>Observaciones sobre uso de productos</span><textarea name="obsProductos"></textarea></label>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 6: SANIDAD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-sanidad">
+  <h2><span class="ico">🩺</span> Sanidad y prevalencias</h2>
+  <div class="grid2">
+    <label class="field"><span>Enfermedades más frecuentes</span><textarea name="enfermedades"></textarea></label>
+    <label class="field"><span>Problemas en pasturas por plagas</span><textarea name="plagasPasturas" placeholder="Ej: spittlebugs, gusanos cortadores, hormigas"></textarea></label>
+    <label class="field"><span>Mortalidad por período</span><input type="text" name="mortalidad"></label>
+    <label class="field"><span>Período evaluado</span><input type="text" name="periodo"></label>
+  </div>
+  <label class="field" style="margin-top:14px;"><span>Afecciones comunes en el establecimiento</span><textarea name="afeccionesComunes"></textarea></label>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 7: PARTICIPACIÓN AGROFORCE EN EL MERCADO             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-mercado">
+  <h2><span class="ico">📊</span> Participación AGROFORCE en el mercado</h2>
+  <p style="font-size:var(--fs-sm);color:var(--gris3);margin-bottom:20px;">
+    Estimaciones por establecimiento visitado. Estos datos alimentan los gráficos de participación de AGROFORCE en el mercado local de pasturas.
+  </p>
+
+  <!-- BLOQUE 1: PASTURAS DEL ESTABLECIMIENTO -->
+  <h3>1. Composición de pasturas del establecimiento</h3>
+  <div class="grid3">
+    <label class="field">
+      <span>Total de ha de pasturas del establecimiento</span>
+      <input type="number" name="mkt_haPasturas" placeholder="Ej: 1500">
+    </label>
+    <label class="field">
+      <span>Ha implantadas (pasturas cultivadas)</span>
+      <input type="number" name="mkt_haImplantadas" placeholder="Ej: 800">
+    </label>
+    <label class="field">
+      <span>Ha campo natural / sin implantar</span>
+      <input type="number" name="mkt_haCampoNatural" placeholder="Ej: 700">
+    </label>
+  </div>
+  <div class="merc-calc" id="calc-implantacion" style="margin-top:12px;"></div>
+
+  <!-- BLOQUE 2: MÉTODO DE TRABAJO -->
+  <h3 style="margin-top:28px;">2. Método de trabajo en las pasturas implantadas</h3>
+  <div class="grid3">
+    <label class="field">
+      <span>Ha trabajadas de manera mecánica</span>
+      <input type="number" name="mkt_haMecanica" placeholder="Ej: 300">
+    </label>
+    <label class="field">
+      <span>Ha trabajadas con productos químicos</span>
+      <input type="number" name="mkt_haQuimica" placeholder="Ej: 500">
+    </label>
+    <label class="field">
+      <span>Ha sin tratamiento registrado</span>
+      <input type="number" name="mkt_haSinTrat" placeholder="Ej: 0">
+    </label>
+  </div>
+  <div class="merc-calc" id="calc-metodo" style="margin-top:12px;"></div>
+
+  <!-- BLOQUE 3: PARTICIPACIÓN AGROFORCE -->
+  <h3 style="margin-top:28px;">3. Participación AGROFORCE en las hectáreas químicas</h3>
+  <div class="grid3">
+    <label class="field">
+      <span>Ha trabajadas con productos AGROFORCE</span>
+      <input type="number" name="mkt_haAgroforce" placeholder="Ej: 200">
+    </label>
+    <label class="field">
+      <span>Ha trabajadas con competencia (otros productos)</span>
+      <input type="number" name="mkt_haCompetencia" placeholder="Ej: 300">
+    </label>
+    <label class="field">
+      <span>Principales competidores identificados</span>
+      <input type="text" name="mkt_competidores" placeholder="Ej: Tampa, Croplife, Sin datos">
+    </label>
+  </div>
+  <div class="merc-calc" id="calc-af" style="margin-top:12px;"></div>
+
+  <!-- BLOQUE 4: POTENCIAL -->
+  <h3 style="margin-top:28px;">4. Potencial de captura</h3>
+  <div class="grid2">
+    <label class="field">
+      <span>Ha con potencial de conversión a AGROFORCE</span>
+      <input type="number" name="mkt_haPotencial" placeholder="Ej: 150">
+    </label>
+    <label class="field">
+      <span>Productos AGROFORCE con mayor oportunidad</span>
+      <input type="text" name="mkt_prodPotencial" placeholder="Ej: Malez Off, Renova X">
+    </label>
+  </div>
+
+  <label class="field" style="margin-top:16px;">
+    <span>Observaciones de mercado</span>
+    <textarea name="mkt_obs" placeholder="Notas sobre la situación competitiva, oportunidades, barreras..."></textarea>
+  </label>
+
+  <!-- MINI PREVIEW GRÁFICOS -->
+  <h3 style="margin-top:28px;">Vista previa de participación</h3>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px;">
+    <div class="chart-box" style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;">
+      <h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">Implantadas vs campo natural</h3>
+      <canvas id="prev-implant" style="max-height:180px;"></canvas>
+    </div>
+    <div class="chart-box" style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;">
+      <h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">Método: mecánico vs químico</h3>
+      <canvas id="prev-metodo" style="max-height:180px;"></canvas>
+    </div>
+    <div class="chart-box" style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;">
+      <h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">AGROFORCE vs competencia</h3>
+      <canvas id="prev-af" style="max-height:180px;"></canvas>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:10px;">
+    <button type="button" class="btn btn-primary" onclick="actualizarMercado()">🔄 Actualizar gráficos</button>
+  </div>
+</section>
+
+<!-- TAB 8: RECOMENDACIONES -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="card section-panel" id="tab-rec">
+  <h2><span class="ico">💡</span> Recomendaciones y tratamiento sugerido</h2>
+
+  <div class="rec-card-header" id="recHeader">
+    <span>Área</span><span>Recomendación / Tratamiento</span><span>Prioridad</span><span>Producto AGROFORCE</span><span>Plazo</span><span></span>
+  </div>
+  <div id="recsContainer"></div>
+  <button type="button" class="btn btn-primary" style="margin-top:14px;" onclick="addRec()">+ Agregar recomendación</button>
+
+  <h3 style="margin-top:28px;">Resumen del tratamiento recomendado</h3>
+  <textarea name="tratamientoResumen" class="tall" placeholder="Describí el plan de tratamiento integral recomendado para el establecimiento, priorizando el uso de productos AGROFORCE según el diagnóstico..."></textarea>
+</section>
+
+</form>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- INFORME GENERADO -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="writtenReport" class="report-section">
+  <div id="reportContent"></div>
+</section>
+
+</div><!-- /app -->
+
+
+<script>
+/* ============================================================
+   AGROFORCE PASTURAS — ES5 COMPATIBLE JS
+   No arrow functions, no optional chaining, no const/let,
+   no template literals, no async/await, no fetch
+   ============================================================ */
+
+/* LOGO */
+var AGROFORCE_LOGO = "data:image/png;base64,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";
+
+/* ── TABS ─────────────────────────────────────────────────── */
+function showTab(id) {
+  var panels = document.querySelectorAll(".section-panel");
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove("active");
+  var tabs = document.querySelectorAll(".section-tab");
+  for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
+  var panel = document.getElementById(id);
+  if (panel) panel.classList.add("active");
+  var map = {"tab-ident":0,"tab-carga":1,"tab-pasturas":2,"tab-infra":3,"tab-prod":4,"tab-sanidad":5,"tab-mercado":6,"tab-rec":7};
+  if (map[id] !== undefined && tabs[map[id]]) tabs[map[id]].classList.add("active");
+}
+
+/* ── HELPERS ──────────────────────────────────────────────── */
+function val(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  return el ? el.value.trim() : "";
+}
+function numVal(name) {
+  var v = parseFloat(val(name));
+  return isNaN(v) ? 0 : v;
+}
+function checks(name) {
+  var els = document.querySelectorAll('input[name="' + name + '"]:checked');
+  var result = [];
+  for (var i = 0; i < els.length; i++) result.push(els[i].value);
+  return result;
+}
+function syncMsg(msg, color) {
+  var el = document.getElementById("syncMsg");
+  if (el) { el.textContent = msg; el.style.color = color || "#016C00"; }
+}
+function qs(el, sel) {
+  var found = el.querySelector(sel);
+  return found ? found.value : "";
+}
+function qst(el, sel) {
+  var found = el.querySelector(sel);
+  return found ? found.value.trim() : "";
+}
+
+/* ── POTREROS ─────────────────────────────────────────────── */
+var potreroCount = 0;
+function addPotrero() {
+  potreroCount++;
+  var c = document.getElementById("potrerosContainer");
+  var d = document.createElement("div");
+  d.className = "potrero-card";
+  d.setAttribute("data-potrero", potreroCount);
+  d.innerHTML =
+    '<span class="potrero-num">Potrero ' + potreroCount + '</span>' +
+    '<div class="grid3" style="margin-top:4px;">' +
+    '<label class="field"><span>Nombre / N&uacute;mero</span><input type="text" class="pot-nombre"></label>' +
+    '<label class="field"><span>Superficie (ha)</span><input type="number" class="pot-ha"></label>' +
+    '<label class="field"><span>Especie de pastura</span><input type="text" class="pot-especie" placeholder="Ej: Brachiaria brizantha"></label>' +
+    '<label class="field"><span>Fecha de siembra</span><input type="date" class="pot-siembra"></label>' +
+    '<label class="field"><span>Cobertura actual (%)</span><input type="number" class="pot-cobertura" min="0" max="100"></label>' +
+    '<label class="field"><span>Estado</span><select class="pot-estado"><option value=""></option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Degradado</option><option>Muy degradado</option></select></label>' +
+    '<label class="field"><span>% Infestaci&oacute;n de malezas</span><input type="number" class="pot-infest" min="0" max="100" placeholder="Ej: 45"></label>' +
+    '<label class="field"><span>M&eacute;todo de limpieza</span><select class="pot-metodo"><option value=""></option><option>Mec&aacute;nico</option><option>Qu&iacute;mico</option><option>Mixto (mec&aacute;nico + qu&iacute;mico)</option><option>Sin tratamiento</option></select></label>' +
+    '<label class="field"><span>Ha tratadas en este potrero</span><input type="number" class="pot-ha-trat" placeholder="Ej: 120"></label>' +
+    '<label class="field"><span>Carga animal (cab/ha)</span><input type="text" class="pot-carga"></label>' +
+    '<label class="field"><span>Observaciones</span><input type="text" class="pot-obs"></label>' +
+    '</div>';
+  c.appendChild(d);
+}
+
+/* ── INTERVENCIONES ───────────────────────────────────────── */
+var intervCount = 0;
+function addIntervencion() {
+  intervCount++;
+  var c = document.getElementById("intervencionesContainer");
+  var d = document.createElement("div");
+  d.className = "sub-card";
+  d.innerHTML =
+    '<h4>Intervenci&oacute;n ' + intervCount + '</h4>' +
+    '<div class="grid3">' +
+    '<label class="field"><span>Potrero / Lote</span><input type="text" class="intv-potrero"></label>' +
+    '<label class="field"><span>Tipo de intervenci&oacute;n</span><select class="intv-tipo"><option value=""></option><option>Siembra / Resiembra</option><option>Control de malezas</option><option>Fertilizaci&oacute;n</option><option>Quema controlada</option><option>Rolado / Chiseleado</option><option>Descanso / Clausura</option><option>Otro</option></select></label>' +
+    '<label class="field"><span>Fecha</span><input type="date" class="intv-fecha"></label>' +
+    '<label class="field"><span>Producto utilizado</span><input type="text" class="intv-producto" placeholder="Ej: Malez Off, Renova X..."></label>' +
+    '<label class="field"><span>Dosis</span><input type="text" class="intv-dosis" placeholder="Ej: 2 L/ha"></label>' +
+    '<label class="field"><span>Resultado observado</span><input type="text" class="intv-resultado"></label>' +
+    '</div>';
+  c.appendChild(d);
+}
+
+/* ── PRODUCTOS AGROFORCE ──────────────────────────────────── */
+var PRODS_AF = ["Renova X","Renova Gold","Malez Off","APT Full","APF Top","Otro producto AGROFORCE"];
+var prodCount = 0;
+function addProducto() {
+  prodCount++;
+  var c = document.getElementById("prodContainer");
+  var d = document.createElement("div");
+  d.className = "sub-card";
+  var opts = '<option value=""></option>';
+  for (var i = 0; i < PRODS_AF.length; i++) opts += '<option>' + PRODS_AF[i] + '</option>';
+  d.innerHTML =
+    '<h4>Producto AGROFORCE ' + prodCount + '</h4>' +
+    '<div class="grid3">' +
+    '<label class="field"><span>Producto</span><select class="af-nombre">' + opts + '</select></label>' +
+    '<label class="field"><span>Uso / Destino</span><select class="af-uso"><option value=""></option><option>Control de malezas en pasturas</option><option>Fertilizaci&oacute;n de pasturas</option><option>Recuperaci&oacute;n de degradaci&oacute;n</option><option>Control de plagas</option><option>Tratamiento de suelos</option><option>Otro</option></select></label>' +
+    '<label class="field"><span>Dosis recomendada</span><input type="text" class="af-dosis" placeholder="Ej: 1.5 L/ha"></label>' +
+    '<label class="field"><span>Frecuencia de aplicaci&oacute;n</span><input type="text" class="af-frecuencia" placeholder="Ej: Anual pre-lluvias"></label>' +
+    '<label class="field"><span>Potrero / &Aacute;rea</span><input type="text" class="af-area"></label>' +
+    '<label class="field"><span>Resultado esperado</span><input type="text" class="af-resultado"></label>' +
+    '</div>';
+  c.appendChild(d);
+}
+function addOtroInsumo() {
+  var tbody = document.getElementById("otrosInsumosBody");
+  var row = document.createElement("tr");
+  row.innerHTML = '<td><input type="text" class="oi-nombre"></td><td><input type="text" class="oi-empresa"></td><td><input type="text" class="oi-uso"></td>';
+  tbody.appendChild(row);
+}
+
+/* ── RECOMENDACIONES ──────────────────────────────────────── */
+var recCount = 0;
+function addRec() {
+  recCount++;
+  var c = document.getElementById("recsContainer");
+  var d = document.createElement("div");
+  d.className = "rec-card";
+  d.setAttribute("data-rec", recCount);
+  var prodOpts = '<option value=""></option>';
+  for (var i = 0; i < PRODS_AF.length; i++) prodOpts += '<option>' + PRODS_AF[i] + '</option>';
+  prodOpts += '<option>Sin producto AGROFORCE</option>';
+  d.innerHTML =
+    '<select class="rec-area"><option>Pasturas</option><option>Malezas</option><option>Fertilizaci&oacute;n</option><option>Sanidad animal</option><option>Infraestructura</option><option>Manejo</option><option>Otro</option></select>' +
+    '<textarea class="rec-texto" placeholder="Descripci&oacute;n del tratamiento..." style="min-height:60px;"></textarea>' +
+    '<select class="rec-prioridad"><option>Alta</option><option>Media</option><option>Baja</option></select>' +
+    '<select class="rec-producto">' + prodOpts + '</select>' +
+    '<input type="text" class="rec-plazo" placeholder="Ej: 30 d&iacute;as">' +
+    '<button type="button" class="btn-rm" onclick="this.parentElement.remove()">&#10005;</button>';
+  c.appendChild(d);
+}
+
+/* ── DATA GETTERS ─────────────────────────────────────────── */
+function getPotreros() {
+  var cards = document.querySelectorAll(".potrero-card");
+  var result = [];
+  for (var i = 0; i < cards.length; i++) {
+    var d = cards[i];
+    var obj = {
+      nombre:   qst(d, ".pot-nombre"),
+      ha:       qst(d, ".pot-ha"),
+      especie:  qst(d, ".pot-especie"),
+      siembra:  qs(d,  ".pot-siembra"),
+      cobertura:qs(d,  ".pot-cobertura"),
+      estado:   qs(d,  ".pot-estado"),
+      malezas:  qs(d,  ".pot-malezas"),
+      infest:   qst(d, ".pot-infest"),
+      metodo:   qs(d,  ".pot-metodo"),
+      haTrat:   qst(d, ".pot-ha-trat"),
+      carga:    qst(d, ".pot-carga"),
+      obs:      qst(d, ".pot-obs")
+    };
+    if (obj.nombre || obj.ha) result.push(obj);
+  }
+  return result;
+}
+function getIntervenciones() {
+  var cards = document.querySelectorAll("#intervencionesContainer .sub-card");
+  var result = [];
+  for (var i = 0; i < cards.length; i++) {
+    var d = cards[i];
+    var obj = {
+      potrero:  qst(d, ".intv-potrero"),
+      tipo:     qs(d,  ".intv-tipo"),
+      fecha:    qs(d,  ".intv-fecha"),
+      producto: qst(d, ".intv-producto"),
+      dosis:    qst(d, ".intv-dosis"),
+      resultado:qst(d, ".intv-resultado")
+    };
+    if (obj.tipo || obj.producto) result.push(obj);
+  }
+  return result;
+}
+function getProductosAF() {
+  var cards = document.querySelectorAll("#prodContainer .sub-card");
+  var result = [];
+  for (var i = 0; i < cards.length; i++) {
+    var d = cards[i];
+    var obj = {
+      nombre:    qs(d, ".af-nombre"),
+      uso:       qs(d, ".af-uso"),
+      dosis:     qst(d,".af-dosis"),
+      frecuencia:qst(d,".af-frecuencia"),
+      area:      qst(d,".af-area"),
+      resultado: qst(d,".af-resultado")
+    };
+    if (obj.nombre) result.push(obj);
+  }
+  return result;
+}
+function getRecomendaciones() {
+  var cards = document.querySelectorAll("#recsContainer .rec-card");
+  var result = [];
+  for (var i = 0; i < cards.length; i++) {
+    var d = cards[i];
+    var obj = {
+      area:      qs(d, ".rec-area"),
+      texto:     qst(d,".rec-texto"),
+      prioridad: qs(d, ".rec-prioridad"),
+      producto:  qs(d, ".rec-producto"),
+      plazo:     qst(d,".rec-plazo")
+    };
+    if (obj.texto) result.push(obj);
+  }
+  return result;
+}
+
+/* ── CLEAR FORM ───────────────────────────────────────────── */
+function clearForm() {
+  if (!confirm("Limpiar toda la planilla?")) return;
+  var els = document.querySelectorAll("input,textarea,select");
+  for (var i = 0; i < els.length; i++) {
+    if (els[i].type === "checkbox") els[i].checked = false;
+    else els[i].value = "";
+  }
+  document.getElementById("writtenReport").style.display = "none";
+}
+
+/* ── REPORT BUILDER ───────────────────────────────────────── */
+var chartsArr = [];
+
+function buildReportHTML(estName, fecha, tipos, potreros, intervenciones, productosAF, recs, haTotal, haPasturas, haAgricolas, haReserva, haOtros) {
+  var h = "";
+  h += '<div class="report-header-block">';
+  h += '<div class="rh-logo"><img src="' + AGROFORCE_LOGO + '" alt="AGROFORCE" style="height:80px;object-fit:contain;display:block;"></div>';
+  h += '<div class="rh-body"><div class="rh-sub">Informe T&eacute;cnico &middot; Diagn&oacute;stico de Pasturas</div>';
+  h += '<h1>' + estName + '</h1>';
+  h += '<div class="rh-meta">';
+  h += '<div class="rh-meta-item"><strong>' + (val("propietario")||"&mdash;") + '</strong>Propietario</div>';
+  h += '<div class="rh-meta-item"><strong>' + (val("ubicacion")||"&mdash;") + '</strong>Ubicaci&oacute;n</div>';
+  h += '<div class="rh-meta-item"><strong>' + (haTotal||"&mdash;") + ' ha</strong>Sup. total</div>';
+  h += '<div class="rh-meta-item"><strong>' + (tipos.length ? tipos.join(", ") : "No especificado") + '</strong>Tipo de explotaci&oacute;n</div>';
+  h += '</div></div>';
+  h += '<div class="rh-right"><span class="doc-eye">Documento</span><span class="doc-name">Diagn&oacute;stico AGROFORCE</span>';
+  h += '<span class="doc-date">&#128197; ' + fecha + '</span>';
+  h += '<span style="font-size:11px;opacity:.7;margin-top:8px;">Dr. M. L&oacute;pez &middot; Reg. 3416<br>Dr. C. Di Natale &middot; Reg. 1920<br>AGROFORCE Productos Agr&iacute;colas<br>RUC 80148174-0</span>';
+  h += '</div></div>';
+
+  h += '<div class="kpi-strip">';
+  h += '<div class="kpi-card"><span>Superficie total</span><strong>' + (haTotal||"&mdash;") + ' ha</strong></div>';
+  h += '<div class="kpi-card" style="border-color:var(--verde)"><span>Ha en pasturas</span><strong>' + (haPasturas||"&mdash;") + ' ha</strong></div>';
+  h += '<div class="kpi-card" style="border-color:var(--navy)"><span>Animales actuales</span><strong>' + (val("animalesActuales")||"&mdash;") + '</strong></div>';
+  h += '<div class="kpi-card" style="border-color:var(--ambar)"><span>Productos AGROFORCE</span><strong>' + productosAF.length + '</strong></div>';
+  h += '</div>';
+
+  h += '<div class="rblock"><h3>Resumen ejecutivo</h3>';
+  h += '<p>Visita t&eacute;cnica de diagn&oacute;stico al establecimiento <strong>' + estName + '</strong> en <strong>' + (val("ubicacion")||"sin ubicaci&oacute;n") + '</strong>.</p>';
+  h += '<p>Superficie: <strong>' + (haTotal||"&mdash;") + ' ha</strong> total &mdash; <strong>' + (haPasturas||"&mdash;") + ' ha</strong> pasturas &mdash; <strong>' + (haAgricolas||"&mdash;") + ' ha</strong> agricultura.</p>';
+  h += '<p>Potreros: <strong>' + potreros.length + '</strong> &mdash; Intervenciones: <strong>' + intervenciones.length + '</strong> &mdash; Tipo: <strong>' + (tipos.length ? tipos.join(", ") : "No especificado") + '</strong>.</p>';
+  h += '</div>';
+
+  h += '<div style="margin-bottom:8px;padding:4px 0;border-bottom:2px solid var(--verde);"><span style="font-size:11px;font-weight:700;color:var(--verde2);text-transform:uppercase;letter-spacing:.5px;">Pasturas y superficie</span></div>';
+  h += '<div class="chart-grid" style="margin-bottom:20px;">';
+  h += '<div class="chart-box"><h3>Distribuci&oacute;n de superficie</h3><canvas id="ch-sup"></canvas></div>';
+  h += '<div class="chart-box"><h3>Cultivada vs potencial</h3><canvas id="ch-cultiv"></canvas></div>';
+  h += '<div class="chart-box"><h3>Estado de potreros</h3><canvas id="ch-estado"></canvas></div>';
+  h += '</div>';
+
+  h += '<div style="margin-bottom:8px;padding:4px 0;border-bottom:2px solid var(--ambar);"><span style="font-size:11px;font-weight:700;color:var(--ambar);text-transform:uppercase;letter-spacing:.5px;">Infestaci&oacute;n y cobertura</span></div>';
+  h += '<div class="chart-grid" style="margin-bottom:20px;">';
+  h += '<div class="chart-box"><h3>% Infestaci&oacute;n por potrero</h3><canvas id="ch-infest"></canvas></div>';
+  h += '<div class="chart-box"><h3>% Cobertura por potrero</h3><canvas id="ch-cob"></canvas></div>';
+  h += '<div class="chart-box"><h3>Carga animal</h3><canvas id="ch-carga"></canvas></div>';
+  h += '</div>';
+
+  h += '<div style="margin-bottom:8px;padding:4px 0;border-bottom:2px solid var(--navy);"><span style="font-size:11px;font-weight:700;color:var(--navy2);text-transform:uppercase;letter-spacing:.5px;">M&eacute;todos de limpieza</span></div>';
+  h += '<div class="chart-grid" style="margin-bottom:20px;">';
+  h += '<div class="chart-box"><h3>Mec&aacute;nico vs Qu&iacute;mico vs Mixto</h3><canvas id="ch-metodo"></canvas></div>';
+  h += '<div class="chart-box"><h3>Superficie tratada vs total</h3><canvas id="ch-trat"></canvas></div>';
+  h += '<div class="chart-box"><h3>Prioridad de recomendaciones</h3><canvas id="ch-prio"></canvas></div>';
+  h += '</div>';
+
+  h += '<div style="margin-bottom:8px;padding:4px 0;border-bottom:2px solid var(--verde);"><span style="font-size:11px;font-weight:700;color:var(--verde2);text-transform:uppercase;letter-spacing:.5px;">Productos AGROFORCE</span></div>';
+  h += '<div class="chart-grid" style="margin-bottom:24px;">';
+  h += '<div class="chart-box"><h3>Productos utilizados</h3><canvas id="ch-prod"></canvas></div>';
+  h += '<div class="chart-box" style="grid-column:span 2;"><h3>Participaci&oacute;n AGROFORCE en el mercado</h3><canvas id="ch-cap"></canvas></div>';
+  h += '</div>';
+
+  // Potreros table
+  h += '<div class="rblock"><h3>Estado de potreros evaluados</h3>';
+  if (potreros.length) {
+    h += '<table class="tbl" style="margin-top:0;"><thead><tr><th>Potrero</th><th>Sup.</th><th>Especie</th><th>Cobertura</th><th>Estado</th><th>% Infest.</th><th>M&eacute;todo</th><th>Ha trat.</th><th>Obs.</th></tr></thead><tbody>';
+    for (var i = 0; i < potreros.length; i++) {
+      var p = potreros[i];
+      h += '<tr><td>' + (p.nombre||"&mdash;") + '</td><td>' + (p.ha ? p.ha+" ha" : "&mdash;") + '</td><td>' + (p.especie||"&mdash;") + '</td><td>' + (p.cobertura ? p.cobertura+"%" : "&mdash;") + '</td><td>' + (p.estado||"&mdash;") + '</td><td>' + (p.infest ? p.infest+"%" : "&mdash;") + '</td><td>' + (p.metodo||"&mdash;") + '</td><td>' + (p.haTrat ? p.haTrat+" ha" : "&mdash;") + '</td><td>' + (p.obs||"&mdash;") + '</td></tr>';
+    }
+    h += '</tbody></table>';
+  } else { h += '<p>No se registraron potreros.</p>'; }
+  h += '</div>';
+
+  if (intervenciones.length) {
+    h += '<div class="rblock"><h3>Intervenciones registradas</h3><table class="tbl" style="margin-top:0;"><thead><tr><th>Potrero</th><th>Tipo</th><th>Fecha</th><th>Producto</th><th>Dosis</th><th>Resultado</th></tr></thead><tbody>';
+    for (var j = 0; j < intervenciones.length; j++) {
+      var iv = intervenciones[j];
+      h += '<tr><td>' + (iv.potrero||"&mdash;") + '</td><td>' + (iv.tipo||"&mdash;") + '</td><td>' + (iv.fecha||"&mdash;") + '</td><td>' + (iv.producto||"&mdash;") + '</td><td>' + (iv.dosis||"&mdash;") + '</td><td>' + (iv.resultado||"&mdash;") + '</td></tr>';
+    }
+    h += '</tbody></table></div>';
+  }
+
+  if (productosAF.length) {
+    h += '<div class="rblock verde-border"><h3>Productos AGROFORCE utilizados / recomendados</h3><table class="tbl" style="margin-top:0;"><thead><tr><th>Producto</th><th>Uso</th><th>Dosis</th><th>Frecuencia</th><th>Resultado esperado</th></tr></thead><tbody>';
+    for (var k = 0; k < productosAF.length; k++) {
+      var paf = productosAF[k];
+      h += '<tr><td><strong>' + paf.nombre + '</strong></td><td>' + (paf.uso||"&mdash;") + '</td><td>' + (paf.dosis||"&mdash;") + '</td><td>' + (paf.frecuencia||"&mdash;") + '</td><td>' + (paf.resultado||"&mdash;") + '</td></tr>';
+    }
+    h += '</tbody></table></div>';
+  }
+
+  h += '<div class="rblock"><h3>Infraestructura</h3>';
+  h += '<p>Caminos: <strong>' + (val("caminos")||"&mdash;") + '</strong> &middot; Drenaje: <strong>' + (val("drenaje")||"&mdash;") + '</strong> &middot; Agua: <strong>' + (val("calidadAgua")||"&mdash;") + '</strong> &middot; Dep&oacute;sito: <strong>' + (val("deposito")||"&mdash;") + '</strong></p>';
+  if (val("obsInfraestructura")) h += '<p>' + val("obsInfraestructura") + '</p>';
+  h += '</div>';
+
+  h += '<div class="rblock"><h3>Sanidad</h3>';
+  h += '<p><strong>Enfermedades frecuentes:</strong> ' + (val("enfermedades")||"&mdash;") + '</p>';
+  h += '<p><strong>Plagas en pasturas:</strong> ' + (val("plagasPasturas")||"&mdash;") + '</p>';
+  if (val("afeccionesComunes")) h += '<p><strong>Afecciones comunes:</strong> ' + val("afeccionesComunes") + '</p>';
+  h += '</div>';
+
+  if (recs.length) {
+    h += '<div class="rblock"><h3>Recomendaciones y tratamiento sugerido</h3><table class="tbl" style="margin-top:0;"><thead><tr><th>&Aacute;rea</th><th>Recomendaci&oacute;n</th><th>Prioridad</th><th>Producto AGROFORCE</th><th>Plazo</th></tr></thead><tbody>';
+    for (var r = 0; r < recs.length; r++) {
+      var rec = recs[r];
+      var bc = rec.prioridad === "Alta" ? "badge-red" : rec.prioridad === "Media" ? "badge-ambar" : "badge-verde";
+      h += '<tr><td>' + rec.area + '</td><td>' + (rec.texto||"&mdash;") + '</td><td><span class="badge ' + bc + '">' + rec.prioridad + '</span></td><td>' + (rec.producto||"&mdash;") + '</td><td>' + (rec.plazo||"&mdash;") + '</td></tr>';
+    }
+    h += '</tbody></table></div>';
+  }
+
+  if (val("tratamientoResumen")) {
+    h += '<div class="rblock verde-border"><h3>Plan de tratamiento integral</h3><p style="white-space:pre-wrap;">' + val("tratamientoResumen") + '</p></div>';
+  }
+
+  h += '<div id="rpt-mercado-block"></div>';
+
+  h += '<div class="signatures">';
+  h += '<div class="sig"><p>Firma:</p><strong>Dr. Mart&iacute;n L&oacute;pez</strong><span>M&eacute;dico Veterinario &middot; Reg. N&deg;3416</span><span>AGROFORCE Productos Agr&iacute;colas</span></div>';
+  h += '<div class="sig"><p>Firma:</p><strong>Dr. C&eacute;sar Di Natale</strong><span>M&eacute;dico Veterinario &middot; Reg. N&deg;1920</span><span>AGROFORCE Productos Agr&iacute;colas</span></div>';
+  h += '</div>';
+  return h;
+}
+
+/* ── GENERATE REPORT ──────────────────────────────────────── */
+function generateReport() {
+  var i;
+  for (i = 0; i < chartsArr.length; i++) chartsArr[i].destroy();
+  chartsArr = [];
+
+  var estName      = val("establecimiento") || "Sin nombre";
+  var fecha        = val("fecha") || "---";
+  var tipos        = checks("tipoExplotacion");
+  var potreros     = getPotreros();
+  var intervenciones = getIntervenciones();
+  var productosAF  = getProductosAF();
+  var recs         = getRecomendaciones();
+  var haTotal      = numVal("haTotal");
+  var haPasturas   = numVal("haPasturas");
+  var haAgricolas  = numVal("haAgricolas");
+  var haReserva    = numVal("haReserva");
+  var haOtros      = Math.max(haTotal - haPasturas - haAgricolas - haReserva, 0);
+
+  var prioMap = {Alta:0, Media:0, Baja:0};
+  for (i = 0; i < recs.length; i++) {
+    if (prioMap[recs[i].prioridad] !== undefined) prioMap[recs[i].prioridad]++;
+  }
+  var prodNames = [];
+  for (i = 0; i < productosAF.length; i++) if (productosAF[i].nombre) prodNames.push(productosAF[i].nombre);
+
+  var coberturas = [];
+  for (i = 0; i < potreros.length; i++) {
+    if (potreros[i].cobertura) coberturas.push({label: potreros[i].nombre||"Pot."+(i+1), value: parseFloat(potreros[i].cobertura)||0});
+  }
+
+  var estadoMap = {Excelente:0, Bueno:0, Regular:0, Degradado:0, "Muy degradado":0};
+  for (i = 0; i < potreros.length; i++) {
+    var est = potreros[i].estado;
+    if (est && estadoMap[est] !== undefined) estadoMap[est]++;
+  }
+
+  var report  = document.getElementById("writtenReport");
+  var content = document.getElementById("reportContent");
+  report.style.display = "block";
+  content.innerHTML = buildReportHTML(estName, fecha, tipos, potreros, intervenciones, productosAF, recs, haTotal, haPasturas, haAgricolas, haReserva, haOtros);
+
+  drawCharts(haTotal, haPasturas, haAgricolas, haReserva, haOtros, estadoMap, coberturas, haTotal, prioMap, prodNames, potreros);
+  buildMercadoReport();
+  report.scrollIntoView({behavior:"smooth"});
+}
+
+/* ── CHARTS ───────────────────────────────────────────────── */
+function drawCharts(haTotal, haPasturas, haAgricolas, haReserva, haOtros, estadoMap, coberturas, haGrand, prioMap, prodNames, potreros) {
+  var V="#016C00", V2="#33A000", N="#1A1363", AM="#B07A00", RJ="#B52B2B", GR="#B8C4B8";
+  var i;
+
+  // 1. Distribución superficie
+  chartsArr.push(new Chart(document.getElementById("ch-sup"), {
+    type:"doughnut",
+    data:{labels:["Pasturas","Agricultura","Reserva","Otros"],datasets:[{data:[haPasturas,haAgricolas,haReserva,haOtros],backgroundColor:[V,N,AM,GR]}]},
+    options:{cutout:"55%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}
+  }));
+
+  // 2. Cultivada vs potencial
+  var haUtil = 0;
+  for (i = 0; i < potreros.length; i++) haUtil += parseFloat(potreros[i].ha)||0;
+  var haNoCult = Math.max(haGrand - haUtil, 0);
+  chartsArr.push(new Chart(document.getElementById("ch-cultiv"), {
+    type:"doughnut",
+    data:{labels:["Cultivada","Potencial a desarrollar"],datasets:[{data:[haUtil,haNoCult],backgroundColor:[V,GR]}]},
+    options:{cutout:"65%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}
+  }));
+
+  // 3. Estado potreros
+  var eLabels = Object.keys(estadoMap);
+  var eData   = [];
+  for (i = 0; i < eLabels.length; i++) eData.push(estadoMap[eLabels[i]]);
+  chartsArr.push(new Chart(document.getElementById("ch-estado"), {
+    type:"doughnut",
+    data:{labels:eLabels,datasets:[{data:eData,backgroundColor:[V2,V,N,AM,RJ]}]},
+    options:{cutout:"55%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}
+  }));
+
+  // 4. % Infestación por potrero
+  var infLabels=[], infData=[], infColors=[];
+  for (i = 0; i < potreros.length; i++) {
+    if (potreros[i].infest) {
+      var iv = parseFloat(potreros[i].infest)||0;
+      infLabels.push((potreros[i].nombre||"Pot."+(i+1)).substring(0,10));
+      infData.push(iv);
+      infColors.push(iv>=70 ? RJ : iv>=40 ? AM : V2);
+    }
+  }
+  chartsArr.push(new Chart(document.getElementById("ch-infest"), {
+    type:"bar",
+    data:{labels:infLabels.length?infLabels:["Sin datos"],datasets:[{label:"% Infestaci\u00f3n",data:infData.length?infData:[0],backgroundColor:infColors.length?infColors:[GR],borderRadius:6}]},
+    options:{scales:{y:{max:100,ticks:{callback:function(v){return v+"%"}},grid:{color:"#eee"}},x:{grid:{display:false}}},plugins:{legend:{display:false}}}
+  }));
+
+  // 5. % Cobertura por potrero
+  var cobLabels=[], cobData=[], cobColors=[];
+  for (i = 0; i < coberturas.length; i++) {
+    cobLabels.push(coberturas[i].label.substring(0,10));
+    cobData.push(coberturas[i].value);
+    cobColors.push(coberturas[i].value>=70 ? V : coberturas[i].value>=40 ? AM : RJ);
+  }
+  chartsArr.push(new Chart(document.getElementById("ch-cob"), {
+    type:"bar",
+    data:{labels:cobLabels.length?cobLabels:["Sin datos"],datasets:[{label:"Cobertura %",data:cobData.length?cobData:[0],backgroundColor:cobColors.length?cobColors:[GR],borderRadius:6}]},
+    options:{scales:{y:{max:100,ticks:{callback:function(v){return v+"%"}},grid:{color:"#eee"}},x:{grid:{display:false}}},plugins:{legend:{display:false}}}
+  }));
+
+  // 6. Carga animal
+  chartsArr.push(new Chart(document.getElementById("ch-carga"), {
+    type:"bar",
+    data:{labels:["Capacidad","Actuales"],datasets:[{label:"Animales",data:[numVal("capacidadAnimales"),numVal("animalesActuales")],backgroundColor:[N,V],borderRadius:6}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:"#eee"}},x:{grid:{display:false}}}}
+  }));
+
+  // 7. Mecánico vs Químico vs Mixto
+  var metCounts={Mecanico:0,Quimico:0,Mixto:0,SinTrat:0};
+  var metHa={Mecanico:0,Quimico:0,Mixto:0,SinTrat:0};
+  for (i = 0; i < potreros.length; i++) {
+    var m = potreros[i].metodo || "";
+    var haT = parseFloat(potreros[i].haTrat)||0;
+    if (m.indexOf("Mixto") >= 0)           { metCounts.Mixto++;   metHa.Mixto+=haT; }
+    else if (m.indexOf("Qu") >= 0)         { metCounts.Quimico++; metHa.Quimico+=haT; }
+    else if (m.indexOf("Mec") >= 0)        { metCounts.Mecanico++;metHa.Mecanico+=haT; }
+    else                                    { metCounts.SinTrat++; metHa.SinTrat+=haT; }
+  }
+  chartsArr.push(new Chart(document.getElementById("ch-metodo"), {
+    type:"bar",
+    data:{
+      labels:["Mec\u00e1nico","Qu\u00edmico","Mixto","Sin trat."],
+      datasets:[
+        {label:"Potreros",data:[metCounts.Mecanico,metCounts.Quimico,metCounts.Mixto,metCounts.SinTrat],backgroundColor:[N,V,AM,GR],borderRadius:6},
+        {label:"Ha tratadas",data:[metHa.Mecanico,metHa.Quimico,metHa.Mixto,metHa.SinTrat],backgroundColor:[N+"88",V+"88",AM+"88",GR+"88"],borderRadius:6}
+      ]
+    },
+    options:{plugins:{legend:{position:"top",labels:{font:{size:11}}}},scales:{y:{grid:{color:"#eee"}},x:{grid:{display:false}}}}
+  }));
+
+  // 8. Superficie tratada vs total
+  var haTratTotal = 0;
+  for (i = 0; i < potreros.length; i++) haTratTotal += parseFloat(potreros[i].haTrat)||0;
+  chartsArr.push(new Chart(document.getElementById("ch-trat"), {
+    type:"doughnut",
+    data:{labels:["Ha tratadas","Ha sin tratamiento"],datasets:[{data:[haTratTotal,Math.max(haGrand-haTratTotal,0)],backgroundColor:[V,GR]}]},
+    options:{cutout:"60%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}
+  }));
+
+  // 9. Prioridades
+  chartsArr.push(new Chart(document.getElementById("ch-prio"), {
+    type:"pie",
+    data:{labels:["Alta","Media","Baja"],datasets:[{data:[prioMap.Alta,prioMap.Media,prioMap.Baja],backgroundColor:[RJ,AM,V]}]},
+    options:{plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}
+  }));
+
+  // 10. Productos AF
+  var pLabels = prodNames.length ? prodNames : ["Sin datos"];
+  var pData   = [];
+  for (i = 0; i < pLabels.length; i++) pData.push(1);
+  chartsArr.push(new Chart(document.getElementById("ch-prod"), {
+    type:"bar",
+    data:{labels:pLabels,datasets:[{label:"Usos",data:pData,backgroundColor:V,borderRadius:6}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{grid:{display:false}}}}
+  }));
+
+  // 11. AGROFORCE mercado (ch-cap)
+  var haAF_r   = parseFloat(document.querySelector('[name="mkt_haAgroforce"]').value)||0;
+  var haComp_r = parseFloat(document.querySelector('[name="mkt_haCompetencia"]').value)||0;
+  var haQuim_r = parseFloat(document.querySelector('[name="mkt_haQuimica"]').value)||0;
+  var haMec_r  = parseFloat(document.querySelector('[name="mkt_haMecanica"]').value)||0;
+  chartsArr.push(new Chart(document.getElementById("ch-cap"), {
+    type:"bar",
+    data:{labels:["Mec\u00e1nico","Qu\u00edmico","AGROFORCE","Competencia"],datasets:[{label:"Ha",data:[haMec_r,haQuim_r,haAF_r,haComp_r],backgroundColor:[N,AM,V,RJ],borderRadius:6}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:"#eee"}},x:{grid:{display:false}}}}
+  }));
+}
+
+/* ── PDF ──────────────────────────────────────────────────── */
+function generatePDF() {
+  generateReport();
+  setTimeout(function(){ window.print(); }, 600);
+}
+
+/* ── JSONBIN (XMLHttpRequest) ─────────────────────────────── */
+var BIN_URL = "https://api.jsonbin.io/v3/b/6a07dc2badc21f119aa92844";
+var BIN_KEY = "$2a$10$7rFsw/Rs1i.Z39Kt2LYdVuNmfJc0OR5xy706GRKw28q1wUi3tVChK";
+var infDB = [];
+
+function xhrGET(url, headers, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  for (var k in headers) xhr.setRequestHeader(k, headers[k]);
+  xhr.onload = function() {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try { callback(null, JSON.parse(xhr.responseText)); }
+      catch(e) { callback(e, null); }
+    } else { callback(new Error("HTTP " + xhr.status), null); }
+  };
+  xhr.onerror = function() { callback(new Error("Network error"), null); };
+  xhr.send();
+}
+
+function xhrPUT(url, headers, body, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("PUT", url, true);
+  for (var k in headers) xhr.setRequestHeader(k, headers[k]);
+  xhr.onload = function() {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try { callback(null, JSON.parse(xhr.responseText)); }
+      catch(e) { callback(e, null); }
+    } else { callback(new Error("HTTP " + xhr.status), null); }
+  };
+  xhr.onerror = function() { callback(new Error("Network error"), null); };
+  xhr.send(JSON.stringify(body));
+}
+
+function loadDB(callback) {
+  xhrGET(BIN_URL + "/latest", {"X-Master-Key": BIN_KEY}, function(err, data) {
+    if (!err && data && data.record) infDB = data.record.pasturas || [];
+    else infDB = [];
+    if (callback) callback();
+  });
+}
+
+function saveToDB(callback) {
+  xhrGET(BIN_URL + "/latest", {"X-Master-Key": BIN_KEY}, function(err, data) {
+    var all = (!err && data && data.record) ? data.record : {};
+    all.pasturas = infDB;
+    xhrPUT(BIN_URL, {"Content-Type":"application/json","X-Master-Key":BIN_KEY}, all, function(err2) {
+      if (callback) callback(err2);
+    });
+  });
+}
+
+function saveReporte() {
+  var est = val("establecimiento");
+  if (!est) { alert("Complet\u00e1 al menos el nombre del establecimiento."); return; }
+  syncMsg("Guardando...", "#888");
+  loadDB(function() {
+    var snap = {
+      id:                Date.now(),
+      establecimiento:   est,
+      fecha:             val("fecha") || new Date().toISOString().split("T")[0],
+      propietario:       val("propietario"),
+      ubicacion:         val("ubicacion"),
+      tipos:             checks("tipoExplotacion"),
+      haTotal:           val("haTotal"),
+      haPasturas:        val("haPasturas"),
+      animalesActuales:  val("animalesActuales"),
+      estadoPasturas:    val("estadoPasturasGral"),
+      nivelMalezas:      val("nivelMalezas"),
+      tratamientoResumen:val("tratamientoResumen"),
+      productosAF:       (function(){ var a=[]; var ps=getProductosAF(); for(var i=0;i<ps.length;i++) if(ps[i].nombre) a.push(ps[i].nombre); return a; })(),
+      recsCount:         getRecomendaciones().length,
+      mkt_haAgroforce:   val("mkt_haAgroforce"),
+      mkt_haCompetencia: val("mkt_haCompetencia"),
+      guardado:          new Date().toLocaleString("es-PY")
+    };
+    infDB.push(snap);
+    saveToDB(function(err) {
+      if (err) syncMsg("Error al guardar", "#B52B2B");
+      else {
+        syncMsg("Guardado en nube", "#016C00");
+        setTimeout(function(){ syncMsg("",""); }, 3000);
+      }
+    });
+  });
+}
+
+function showHistorial() {
+  syncMsg("Cargando...", "#888");
+  loadDB(function() {
+    syncMsg("", "");
+    var lista = document.getElementById("historialLista");
+    if (!infDB.length) {
+      lista.innerHTML = '<div class="hist-empty">No hay informes guardados a&uacute;n.</div>';
+    } else {
+      var html_h = "";
+      var sorted = infDB.slice().reverse();
+      for (var i = 0; i < sorted.length; i++) {
+        var rec = sorted[i];
+        html_h += '<div class="hist-card">';
+        html_h += '<div class="hist-card-body">';
+        html_h += '<h4>' + rec.establecimiento + '</h4>';
+        html_h += '<div class="meta">Fecha: ' + rec.fecha + ' &middot; ' + (rec.ubicacion||"&mdash;") + ' &middot; ' + (rec.haTotal||"&mdash;") + ' ha</div>';
+        html_h += '<div class="meta">Estado pasturas: <strong>' + (rec.estadoPasturas||"&mdash;") + '</strong> &middot; AGROFORCE: <strong>' + ((rec.productosAF||[]).join(", ")||"&mdash;") + '</strong></div>';
+        html_h += '<div style="font-size:11px;color:var(--gris2);margin-top:6px;">Guardado: ' + rec.guardado + '</div>';
+        html_h += '</div>';
+        html_h += '<button class="btn btn-danger" style="white-space:nowrap;" onclick="deleteInforme(' + rec.id + ')">&#10005;</button>';
+        html_h += '</div>';
+      }
+      lista.innerHTML = html_h;
+    }
+    document.getElementById("historialModal").style.display = "flex";
+  });
+}
+
+function deleteInforme(id) {
+  if (!confirm("Eliminar este informe?")) return;
+  var newDB = [];
+  for (var i = 0; i < infDB.length; i++) if (infDB[i].id !== id) newDB.push(infDB[i]);
+  infDB = newDB;
+  saveToDB(function() { showHistorial(); });
+}
+
+function closeHistorial() {
+  document.getElementById("historialModal").style.display = "none";
+}
+
+/* ── MERCADO ──────────────────────────────────────────────── */
+function getMktVal(name) {
+  var el = document.querySelector('[name="' + name + '"]');
+  var v = el ? parseFloat(el.value) : NaN;
+  return isNaN(v) ? 0 : v;
+}
+
+function actualizarMercado() {
+  var haPast  = getMktVal("mkt_haPasturas");
+  var haImpl  = getMktVal("mkt_haImplantadas");
+  var haCampo = getMktVal("mkt_haCampoNatural");
+  var haMec   = getMktVal("mkt_haMecanica");
+  var haQuim  = getMktVal("mkt_haQuimica");
+  var haSin   = getMktVal("mkt_haSinTrat");
+  var haAF    = getMktVal("mkt_haAgroforce");
+  var haComp  = getMktVal("mkt_haCompetencia");
+  var totQ    = haQuim || (haAF + haComp);
+
+  var pctImpl  = haPast  > 0 ? ((haImpl/haPast)*100).toFixed(1)  : "---";
+  var pctCampo = haPast  > 0 ? ((haCampo/haPast)*100).toFixed(1) : "---";
+  var pctMec   = haImpl  > 0 ? ((haMec/haImpl)*100).toFixed(1)   : "---";
+  var pctQuim  = haImpl  > 0 ? ((haQuim/haImpl)*100).toFixed(1)  : "---";
+  var pctAF    = totQ    > 0 ? ((haAF/totQ)*100).toFixed(1)      : "---";
+  var pctComp  = totQ    > 0 ? ((haComp/totQ)*100).toFixed(1)    : "---";
+
+  var el1 = document.getElementById("calc-implantacion");
+  if (el1) el1.innerHTML = '<div class="merc-calc">' +
+    '<div class="merc-stat"><span class="label">Total pasturas</span><span class="value">' + (haPast||"---") + ' ha</span></div>' +
+    '<div class="merc-stat"><span class="label">Ha implantadas</span><span class="value">' + (haImpl||"---") + ' ha</span><span class="pct">' + pctImpl + '% del total</span></div>' +
+    '<div class="merc-stat"><span class="label">Campo natural</span><span class="value">' + (haCampo||"---") + ' ha</span><span class="pct">' + pctCampo + '% del total</span></div>' +
+    '</div>';
+
+  var el2 = document.getElementById("calc-metodo");
+  if (el2) el2.innerHTML = '<div class="merc-calc">' +
+    '<div class="merc-stat"><span class="label">Trat. mec&aacute;nico</span><span class="value">' + (haMec||"---") + ' ha</span><span class="pct">' + pctMec + '% de implantadas</span></div>' +
+    '<div class="merc-stat"><span class="label">Trat. qu&iacute;mico</span><span class="value">' + (haQuim||"---") + ' ha</span><span class="pct">' + pctQuim + '% de implantadas</span></div>' +
+    '<div class="merc-stat highlight"><span class="label">Sin tratamiento</span><span class="value">' + (haSin||"0") + ' ha</span><span class="pct">Potencial AGROFORCE</span></div>' +
+    '</div>';
+
+  var el3 = document.getElementById("calc-af");
+  if (el3) el3.innerHTML = '<div class="merc-calc">' +
+    '<div class="merc-stat"><span class="label">Total ha qu&iacute;micas</span><span class="value">' + (totQ||"---") + ' ha</span></div>' +
+    '<div class="merc-stat highlight"><span class="label">AGROFORCE</span><span class="value">' + (haAF||"---") + ' ha</span><span class="pct">' + pctAF + '% del mercado</span></div>' +
+    '<div class="merc-stat"><span class="label">Competencia</span><span class="value">' + (haComp||"---") + ' ha</span><span class="pct">' + pctComp + '% del mercado</span></div>' +
+    '</div>';
+
+  // Preview charts
+  if (window.prevCharts) {
+    if (window.prevCharts.impl) window.prevCharts.impl.destroy();
+    if (window.prevCharts.met)  window.prevCharts.met.destroy();
+    if (window.prevCharts.af)   window.prevCharts.af.destroy();
+  }
+  window.prevCharts = {};
+
+  var c1 = document.getElementById("prev-implant");
+  var c2 = document.getElementById("prev-metodo");
+  var c3 = document.getElementById("prev-af");
+  if (c1) window.prevCharts.impl = new Chart(c1, {type:"doughnut",data:{labels:["Implantadas","Campo natural"],datasets:[{data:[haImpl,haCampo],backgroundColor:["#016C00","#B8C4B8"]}]},options:{cutout:"60%",plugins:{legend:{position:"bottom",labels:{font:{size:10}}}}}});
+  if (c2) window.prevCharts.met  = new Chart(c2, {type:"doughnut",data:{labels:["Mec\u00e1nico","Qu\u00edmico","Sin trat."],datasets:[{data:[haMec,haQuim,haSin],backgroundColor:["#1A1363","#016C00","#B8C4B8"]}]},options:{cutout:"60%",plugins:{legend:{position:"bottom",labels:{font:{size:10}}}}}});
+  if (c3) window.prevCharts.af   = new Chart(c3, {type:"doughnut",data:{labels:["AGROFORCE","Competencia"],datasets:[{data:[haAF,haComp],backgroundColor:["#016C00","#B52B2B"]}]},options:{cutout:"60%",plugins:{legend:{position:"bottom",labels:{font:{size:10}}}}}});
+}
+
+function buildMercadoReport() {
+  var haAF   = getMktVal("mkt_haAgroforce");
+  var haComp = getMktVal("mkt_haCompetencia");
+  var haQuim = getMktVal("mkt_haQuimica");
+  var haMec  = getMktVal("mkt_haMecanica");
+  var haImpl = getMktVal("mkt_haImplantadas");
+  var haPast = getMktVal("mkt_haPasturas");
+  var haCampo= getMktVal("mkt_haCampoNatural");
+  var haSin  = getMktVal("mkt_haSinTrat");
+  var haPot  = getMktVal("mkt_haPotencial");
+  var el     = document.getElementById("rpt-mercado-block");
+  if (!el) return;
+  if (!haPast && !haImpl && !haAF) { el.innerHTML = ""; return; }
+
+  var totQ   = haQuim || (haAF + haComp);
+  var pctAF  = totQ > 0 ? ((haAF/totQ)*100).toFixed(1) : "---";
+  var pctComp= totQ > 0 ? ((haComp/totQ)*100).toFixed(1): "---";
+  var pctImpl= haPast > 0 ? ((haImpl/haPast)*100).toFixed(1):"---";
+  var pctMec = haImpl > 0 ? ((haMec/haImpl)*100).toFixed(1):"---";
+  var pctQuim= haImpl > 0 ? ((haQuim/haImpl)*100).toFixed(1):"---";
+
+  el.innerHTML =
+    '<div class="rblock verde-border" style="margin-bottom:18px;">' +
+    '<h3>Participaci&oacute;n AGROFORCE en el mercado</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0;">' +
+    '<div class="kpi-card" style="border-color:var(--verde)"><span>Ha pasturas totales</span><strong>' + (haPast||"---") + ' ha</strong></div>' +
+    '<div class="kpi-card" style="border-color:var(--verde)"><span>Ha implantadas</span><strong>' + (haImpl||"---") + ' ha <small>(' + pctImpl + '%)</small></strong></div>' +
+    '<div class="kpi-card" style="border-color:var(--gris2)"><span>Campo natural</span><strong>' + (haCampo||"---") + ' ha</strong></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;">' +
+    '<div class="kpi-card" style="border-color:var(--navy)"><span>Trat. mec&aacute;nico</span><strong>' + (haMec||"---") + ' ha <small>(' + pctMec + '%)</small></strong></div>' +
+    '<div class="kpi-card" style="border-color:var(--ambar)"><span>Trat. qu&iacute;mico</span><strong>' + (haQuim||"---") + ' ha <small>(' + pctQuim + '%)</small></strong></div>' +
+    '<div class="kpi-card" style="border-color:var(--verde)"><span>AGROFORCE</span><strong style="color:var(--verde2)">' + (haAF||"---") + ' ha &mdash; ' + pctAF + '%</strong></div>' +
+    '<div class="kpi-card" style="border-color:var(--rojo)"><span>Competencia</span><strong style="color:var(--rojo)">' + (haComp||"---") + ' ha &mdash; ' + pctComp + '%</strong></div>' +
+    '</div>' +
+    (val("mkt_competidores") ? '<p style="font-size:var(--fs-sm)"><strong>Competidores:</strong> ' + val("mkt_competidores") + '</p>' : '') +
+    (val("mkt_obs") ? '<p style="font-size:var(--fs-sm);margin-top:6px;"><strong>Obs.:</strong> ' + val("mkt_obs") + '</p>' : '') +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px;">' +
+    '<div style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;"><h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">Implantadas vs campo natural</h3><canvas id="rpt-ch-impl" style="max-height:200px;"></canvas></div>' +
+    '<div style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;"><h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">Mec&aacute;nico vs Qu&iacute;mico</h3><canvas id="rpt-ch-met" style="max-height:200px;"></canvas></div>' +
+    '<div style="background:var(--gris0);border:1px solid var(--gris1);border-radius:var(--r);padding:16px;"><h3 style="font-size:var(--fs-sm);font-weight:700;color:var(--navy);margin-bottom:10px;">AGROFORCE vs Competencia</h3><canvas id="rpt-ch-af" style="max-height:200px;"></canvas></div>' +
+    '</div>';
+
+  setTimeout(function() {
+    var c1 = document.getElementById("rpt-ch-impl");
+    var c2 = document.getElementById("rpt-ch-met");
+    var c3 = document.getElementById("rpt-ch-af");
+    if (c1) chartsArr.push(new Chart(c1, {type:"doughnut",data:{labels:["Implantadas","Campo natural"],datasets:[{data:[haImpl,haCampo],backgroundColor:["#016C00","#B8C4B8"]}]},options:{cutout:"55%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}}));
+    if (c2) chartsArr.push(new Chart(c2, {type:"doughnut",data:{labels:["Mec\u00e1nico","Qu\u00edmico","Sin trat."],datasets:[{data:[haMec,haQuim,haSin],backgroundColor:["#1A1363","#016C00","#B8C4B8"]}]},options:{cutout:"55%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}}));
+    if (c3) chartsArr.push(new Chart(c3, {type:"doughnut",data:{labels:["AGROFORCE","Competencia"],datasets:[{data:[haAF,haComp],backgroundColor:["#016C00","#B52B2B"]}]},options:{cutout:"55%",plugins:{legend:{position:"bottom",labels:{font:{size:11}}}}}}));
+  }, 150);
+}
+
+/* ── INIT ─────────────────────────────────────────────────── */
+window.onload = function() {
+  // Set logo
+  var logos = document.querySelectorAll("#headerLogo");
+  for (var i = 0; i < logos.length; i++) logos[i].src = AGROFORCE_LOGO;
+  // Init
+  addPotrero();
+  addIntervencion();
+  addProducto();
+  addRec();
+  // Mercado input listeners
+  var mktFields = ["mkt_haPasturas","mkt_haImplantadas","mkt_haCampoNatural","mkt_haMecanica","mkt_haQuimica","mkt_haSinTrat","mkt_haAgroforce","mkt_haCompetencia"];
+  for (var j = 0; j < mktFields.length; j++) {
+    (function(name) {
+      var el = document.querySelector('[name="' + name + '"]');
+      if (el) el.addEventListener("input", actualizarMercado);
+    })(mktFields[j]);
+  }
+  // Load cloud data
+  loadDB(null);
+};
+
+</script>
+</body>
+</html>
